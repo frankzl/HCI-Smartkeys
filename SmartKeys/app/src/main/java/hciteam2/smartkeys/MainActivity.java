@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean editing = true;
     private LinkedList<ButtonItem> coordinates;
     private TCPClient mTcpClient;
+    connectTask serverTask;
 
     int buttonWidth = 200;
     int buttonHeight = 200;
@@ -78,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
         Button btn_toggleEditing = (Button) findViewById(R.id.btn_toggleEditing);
 
         coordinates = new LinkedList<>();
-        new connectTask().execute("");
 
         btn_toggleEditing.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -93,6 +93,13 @@ public class MainActivity extends AppCompatActivity {
                 editing = !editing;
             }
         });
+    }
+
+    public void connectToServer(String ip){
+        TCPClient.SERVERIP = ip;
+        if(serverTask != null) serverTask.cancel(true);
+        serverTask = new connectTask();
+        serverTask.execute("");
     }
 
     public ButtonItem createKey(float x, float y, String val){
@@ -198,17 +205,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected TCPClient doInBackground(String... message) {
 
-            //we create a TCPClient object and
             mTcpClient = new TCPClient(new TCPClient.OnMessageReceived() {
-                @Override
-                //here the messageReceived method is implemented
                 public void messageReceived(String message) {
                     //this method calls the onProgressUpdate
                     publishProgress(message);
                 }
             });
             mTcpClient.run();
-
             return null;
         }
 
@@ -261,6 +264,7 @@ public class MainActivity extends AppCompatActivity {
                                         // get user input and set it to result
                                         // edit text
                                         //result.setText(userInput.getText());
+                                        connectToServer(userInput.getText().toString());
                                     }
                                 })
                         .setNegativeButton("Cancel",
@@ -285,6 +289,7 @@ public class MainActivity extends AppCompatActivity {
                 editor.putBoolean("checkbox", item.isChecked());
                 editor.commit();
 
+                editing = item.isChecked();
                 if(item.isChecked()){
                     Toast.makeText(getApplicationContext(),"Edit mode is currently ON",Toast.LENGTH_LONG).show();
                 }else{
@@ -293,12 +298,13 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_check2:
+
                 item.setChecked(!item.isChecked());
                 SharedPreferences settings2 = getSharedPreferences("settings", 0);
                 SharedPreferences.Editor editor2 = settings2.edit();
                 editor2.putBoolean("checkbox", item.isChecked());
                 editor2.commit();
-
+                editing = item.isChecked();
                 if(item.isChecked()){
                     Toast.makeText(getApplicationContext(),"Rearrange mode is currently ON",Toast.LENGTH_LONG).show();
                 }else{

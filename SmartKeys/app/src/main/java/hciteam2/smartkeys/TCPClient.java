@@ -12,7 +12,7 @@ import java.net.Socket;
 public class TCPClient {
 
     private String serverMessage;
-    public static String SERVERIP = "192.249.31.181"; //your computer IP address
+    public static String SERVERIP = "x"; //your computer IP address
     public static final int SERVERPORT = 4444;
     private OnMessageReceived mMessageListener = null;
     private boolean mRun = false;
@@ -92,7 +92,6 @@ public class TCPClient {
             }
 
         } catch (Exception e) {
-
             Log.e("TCP", "C: Error", e);
 
         }

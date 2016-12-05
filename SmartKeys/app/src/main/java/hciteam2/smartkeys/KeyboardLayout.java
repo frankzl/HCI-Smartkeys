@@ -12,7 +12,7 @@ public class KeyboardLayout {
     private static String [] qwerty = {"§1234567890-=xVK_BACK_SPACE",
                                 "VK_TABxQWERTYUIOPxVK_OPEN_BRACKETxVK_CLOSE_BRACKETxVK_ENTER",
                                 "VK_CAPS_LOCKxASDFGHJKL;'\\",
-                                "VK_SHIFTxVK_BACKQUOTExZXCVBNM,./xVK_SHIFT",
+                                "VK_SHIFTxVK_BACK_QUOTExZXCVBNM,./xVK_SHIFT",
                                 "VK_CONTROLxVK_WINDOWSxVK_ALTxVK_SPACExVK_ALT_GRAPHxVK_CONTROLxVK_LEFTxVK_UPxVK_DOWNxVK_RIGHT"};
 
     public static List<ButtonInfo> getQWERTYList(){
