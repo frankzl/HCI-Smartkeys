@@ -63,6 +63,7 @@ public class ButtonItem extends Button{
     }
 
     public boolean isEditing(){ return widget.isEditing(); }
+    public boolean isRearranging() { return widget.isRearranging(); }
 
     public String getVal(){
         return information.getVal();

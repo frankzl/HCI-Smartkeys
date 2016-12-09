@@ -15,6 +15,8 @@ public class KeysOnTouchListener implements OnTouchListener{
     ButtonInfo info;
     float initialTouchX;
     float initialTouchY;
+    float initialRawX;
+    float initialRawY;
 
     public KeysOnTouchListener(TCPClient tcpClient, ButtonInfo info){
         super();
@@ -26,15 +28,21 @@ public class KeysOnTouchListener implements OnTouchListener{
     public boolean onTouch(View v, MotionEvent event) {
         System.out.println(event.getAction());
         ButtonItem element = (ButtonItem) v;
-        if(element.isEditing()){
+
+        if(element.isRearranging()){
+            final int X = (int) event.getRawX();
+            final int Y = (int) event.getRawY();
             if(event.getAction() == MotionEvent.ACTION_DOWN) {
                 RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) v.getLayoutParams();
-                initialTouchX = event.getX()-element.getX();
-                initialTouchY = event.getY()-element.getY();
+                initialTouchX = element.getX();
+                initialTouchY = element.getY();
+                initialRawX = event.getRawX();
+                initialRawY = event.getRawY();
             }else if(event.getAction() == MotionEvent.ACTION_MOVE){
-                element.setX(event.getX() - initialTouchX);
-                element.setY(event.getY() - initialTouchY);
+                element.setX(initialTouchX + event.getRawX() - initialRawX);
+                element.setY(initialTouchY + event.getRawY() - initialRawY);
             }
+
             return true;
         }
         if(tcpClient == null){

@@ -45,7 +45,9 @@ public class MainActivity extends AppCompatActivity {
 
     final Context context = this;
     public Switch switch_mode;
-    private boolean editing = true;
+    private boolean editing = false;
+    private boolean rearranging = false;
+
     private LinkedList<ButtonItem> coordinates;
     private TCPClient mTcpClient;
     connectTask serverTask;
@@ -75,24 +77,8 @@ public class MainActivity extends AppCompatActivity {
 
         createKeysFromList(KeyboardLayout.getQWERTYList());
 
-
-        Button btn_toggleEditing = (Button) findViewById(R.id.btn_toggleEditing);
-
         coordinates = new LinkedList<>();
 
-        btn_toggleEditing.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TextView view = (TextView) findViewById(R.id.txt_mode);
-
-                if(editing){
-                    view.setText("Mode: Editing Off");
-                }else{
-                    view.setText("Mode: Editing On");
-                }
-                editing = !editing;
-            }
-        });
     }
 
     public void connectToServer(String ip){
@@ -152,16 +138,6 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0; i < infoList.size(); i++){
             ButtonInfo info = infoList.get(i);
             ButtonItem btn = createKey(info.getX(), info.getY(), info.getVal());
-            /*final ButtonItem item = new ButtonItem(infoList.get(i), this);
-            item.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(mTcpClient != null) {
-                        mTcpClient.sendMessage(item.getVal()+"");
-                    }
-                }
-
-            });*/
             layout.addView(btn);
         }
     }
@@ -197,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean isEditing(){ return editing;}
+    public boolean isRearranging(){ return rearranging;}
 
     public TCPClient getTcpClient(){ return mTcpClient; }
 
@@ -229,12 +206,12 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main,menu);//Menu Resource, Menu
 
         SharedPreferences settings = getSharedPreferences("settings", 0);
-        boolean isChecked = settings.getBoolean("checkbox", false);
+        boolean isCheckedEdit  = settings.getBoolean("checkbox", editing);
+        boolean isCheckedRearr = settings.getBoolean("checkbox", rearranging);
         MenuItem item1 = menu.findItem(R.id.action_check);
         MenuItem item2 = menu.findItem(R.id.action_check2);
-        item1.setChecked(isChecked);
-        item2.setChecked(isChecked);
-
+        item1.setChecked(!isCheckedEdit);
+        item2.setChecked(!isCheckedRearr);
         return true;
     }
     @Override
@@ -304,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor2 = settings2.edit();
                 editor2.putBoolean("checkbox", item.isChecked());
                 editor2.commit();
-                editing = item.isChecked();
+                rearranging = item.isChecked();
                 if(item.isChecked()){
                     Toast.makeText(getApplicationContext(),"Rearrange mode is currently ON",Toast.LENGTH_LONG).show();
                 }else{

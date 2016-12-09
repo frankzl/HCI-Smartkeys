@@ -12,12 +12,4 @@
         android:id="@+id/txt_mode"
         android:text="Editing Off" />
 
-    <Button
-        android:text="Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:id="@+id/btn_toggleEditing"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
 </RelativeLayout>
