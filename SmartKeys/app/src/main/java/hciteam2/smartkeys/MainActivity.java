@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     public Switch switch_mode;
     private boolean editing = false;
     private boolean rearranging = false;
+    private boolean scaling = true;
 
     private LinkedList<ButtonItem> coordinates;
     private TCPClient mTcpClient;
@@ -174,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean isEditing(){ return editing;}
     public boolean isRearranging(){ return rearranging;}
+    public boolean isScaling(){return scaling;}
 
     public TCPClient getTcpClient(){ return mTcpClient; }
 
@@ -214,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
         item2.setChecked(!isCheckedRearr);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

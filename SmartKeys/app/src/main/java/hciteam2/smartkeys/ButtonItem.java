@@ -45,6 +45,10 @@ public class ButtonItem extends Button{
         this.setY(info.getY()-Constants.key_default_height/2+Constants.key_offset_Y);
     }
 
+    public void setText(){
+        super.setText(information.getVal()+"");
+    }
+
     public void setCenter_offset(){
         this.center_offsetX = this.getWidth()/2;
         this.center_offsetY = this.getHeight()/2;
@@ -64,6 +68,7 @@ public class ButtonItem extends Button{
 
     public boolean isEditing(){ return widget.isEditing(); }
     public boolean isRearranging() { return widget.isRearranging(); }
+    public boolean isScaling() {return widget.isScaling();}
 
     public String getVal(){
         return information.getVal();

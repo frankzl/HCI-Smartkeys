@@ -9,10 +9,10 @@ import java.util.List;
 
 public class KeyboardLayout {
 
-    private static String [] qwerty = {"§1234567890-=xVK_BACK_SPACE",
+    private static String [] qwerty = {"VK_DEAD_TILDEx1234567890xVK_MINUSxVK_EQUALSxVK_BACK_SPACE",
                                 "VK_TABxQWERTYUIOPxVK_OPEN_BRACKETxVK_CLOSE_BRACKETxVK_ENTER",
-                                "VK_CAPS_LOCKxASDFGHJKL;'\\",
-                                "VK_SHIFTxVK_BACK_QUOTExZXCVBNM,./xVK_SHIFT",
+                                "VK_CAPS_LOCKxASDFGHJKLxVK_SEMICOLON'\\",
+                                "VK_SHIFTxVK_BACK_QUOTExZXCVBNMxVK_COMMAxVK_PERIODxVK_SLASHxVK_SHIFT",
                                 "VK_CONTROLxVK_WINDOWSxVK_ALTxVK_SPACExVK_ALT_GRAPHxVK_CONTROLxVK_LEFTxVK_UPxVK_DOWNxVK_RIGHT"};
 
     public static List<ButtonInfo> getQWERTYList(){
@@ -26,7 +26,7 @@ public class KeyboardLayout {
                     line_position+=Constants.key_default_width;
                 }else{
                     for(int z = 0; z < line[j].length(); z++){
-                        keylist.add(new ButtonInfo(line_position, i*Constants.key_default_height, ""+line[j].charAt(z)));
+                        keylist.add(new ButtonInfo(line_position, i*Constants.key_default_height, "VK_"+line[j].charAt(z)));
                         line_position+=Constants.key_default_width;
                     }
                 }
