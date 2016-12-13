@@ -11,7 +11,7 @@ public class KeyboardLayout {
 
     private static String [] qwerty = {"VK_DEAD_TILDEx1234567890xVK_MINUSxVK_EQUALSxVK_BACK_SPACE",
                                 "VK_TABxQWERTYUIOPxVK_OPEN_BRACKETxVK_CLOSE_BRACKETxVK_ENTER",
-                                "VK_CAPS_LOCKxASDFGHJKLxVK_SEMICOLON'\\",
+                                "VK_CAPS_LOCKxASDFGHJKLxVK_SEMICOLONxVK_NUMBER_SIGNxVK_BACK_SLASH",
                                 "VK_SHIFTxVK_BACK_QUOTExZXCVBNMxVK_COMMAxVK_PERIODxVK_SLASHxVK_SHIFT",
                                 "VK_CONTROLxVK_WINDOWSxVK_ALTxVK_SPACExVK_ALT_GRAPHxVK_CONTROLxVK_LEFTxVK_UPxVK_DOWNxVK_RIGHT"};
 

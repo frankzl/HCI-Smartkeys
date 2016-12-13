@@ -27,18 +27,17 @@ public class ButtonItem extends Button{
         this.val = symbol;
         this.widget = widget;
 
-        this.setText(symbol+"");
+        this.setText(information.getName()+"");
         this.setHeight(Constants.key_default_height);
         this.setWidth(Constants.key_default_width);
         this.setX(x-Constants.key_default_width/2+Constants.key_offset_X);
         this.setY(y-Constants.key_default_height/2+Constants.key_offset_Y);
-
     }
 
     public ButtonItem(ButtonInfo info, Activity widget){
         super(widget);
         information = info;
-        this.setText(info.getVal()+"");
+        this.setText(info.getName()+"");
         this.setHeight(Constants.key_default_height);
         this.setWidth(Constants.key_default_width);
         this.setX(info.getX()-Constants.key_default_width/2+Constants.key_offset_X);
@@ -46,7 +45,7 @@ public class ButtonItem extends Button{
     }
 
     public void setText(){
-        super.setText(information.getVal()+"");
+        super.setText(information.getName()+"");
     }
 
     public void setCenter_offset(){

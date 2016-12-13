@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     public Switch switch_mode;
     private boolean editing = false;
     private boolean rearranging = false;
-    private boolean scaling = true;
+    private boolean scaling = false;
 
     private LinkedList<ButtonItem> coordinates;
     private TCPClient mTcpClient;
@@ -78,9 +78,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         createKeysFromList(KeyboardLayout.getQWERTYList());
-
         coordinates = new LinkedList<>();
-
     }
 
     public void connectToServer(String ip){
@@ -91,9 +89,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public ButtonItem createKey(float x, float y, String val){
-        //new SelectKeyDialog().show(getFragmentManager(), "Test");
-        //generateListView(x);
-
         final ButtonItem btn = new ButtonItem(x, y, val, this);
         btn.setOnTouchListener(new KeysOnTouchListener(mTcpClient, btn.information));
         return btn;
@@ -102,35 +97,6 @@ public class MainActivity extends AppCompatActivity {
     public ButtonItem createKey(ButtonInfo info){
         ButtonItem btn = new ButtonItem(info, this);
         return btn;
-    }
-
-
-    public void createKeys(){
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.activity_main);
-
-        while(!coordinates.isEmpty()){
-            Random rnd = new Random();
-
-            final ButtonItem buttonItem = coordinates.remove();
-
-            Button btn = new Button(this);
-            btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(mTcpClient != null) {
-                        mTcpClient.sendMessage(buttonItem.getVal()+"");
-                    }
-                }
-            });
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(100, 100);
-            //layout.addView(btn, params);
-            btn.setText("A");
-            btn.setHeight(10);
-            btn.setWidth(10);
-            //btn.set
-            btn.setX(buttonItem.getX());
-            btn.setY(buttonItem.getY());
-        }
     }
 
     public void createKeysFromList(List<ButtonInfo> infoList){
@@ -198,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-
         }
     }
 
@@ -211,15 +176,13 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences("settings", 0);
         boolean isCheckedEdit  = settings.getBoolean("checkbox", editing);
         boolean isCheckedRearr = settings.getBoolean("checkbox", rearranging);
-        MenuItem item1 = menu.findItem(R.id.action_check);
-        MenuItem item2 = menu.findItem(R.id.action_check2);
-        item1.setChecked(!isCheckedEdit);
-        item2.setChecked(!isCheckedRearr);
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         switch (item.getItemId()) {
             case R.id.item1:
 
@@ -257,11 +220,9 @@ public class MainActivity extends AppCompatActivity {
 
                 // create alert dialog
                 AlertDialog alertDialog = alertDialogBuilder.create();
-
                 // show it
                 alertDialog.show();
-
-                //Toast.makeText(getApplicationContext(),"Item 1 Selected",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"Connecting...",Toast.LENGTH_LONG).show();
                 return true;
             case R.id.action_check:
                 item.setChecked(!item.isChecked());
@@ -279,7 +240,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_check2:
-
                 item.setChecked(!item.isChecked());
                 SharedPreferences settings2 = getSharedPreferences("settings", 0);
                 SharedPreferences.Editor editor2 = settings2.edit();
@@ -294,12 +254,26 @@ public class MainActivity extends AppCompatActivity {
 
                 return true;
 
+            case R.id.action_check3:
+                item.setChecked(!item.isChecked());
+
+                SharedPreferences settings3 = getSharedPreferences("settings", 0);
+                SharedPreferences.Editor editor3 = settings3.edit();
+                editor3.putBoolean("checkbox", item.isChecked());
+                editor3.commit();
+                scaling = item.isChecked();
+                if(item.isChecked()){
+                    Toast.makeText(getApplicationContext(),"Scaling mode is currently ON",Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(getApplicationContext(),"Scaling mode is currently OFF",Toast.LENGTH_LONG).show();
+                }
+
+                return true;
+
 
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    // Display popup attached to the button as a position anchor
 
 }

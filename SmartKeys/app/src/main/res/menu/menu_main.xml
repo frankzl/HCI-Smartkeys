@@ -19,4 +19,12 @@
         android:visible="true"
         android:checkable="true"/>
 
+    <item
+        android:id="@+id/action_check3"
+        android:title="Rescale"
+        android:orderInCategory="200"
+        android:showAsAction="never"
+        android:visible="true"
+        android:checkable="true"/>
+
 </menu>

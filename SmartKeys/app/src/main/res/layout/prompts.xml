@@ -15,6 +15,7 @@
 
     <EditText
         android:id="@+id/editTextDialogUserInput"
+        android:text="192.249.31.165"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
