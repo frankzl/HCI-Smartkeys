@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         GridView lv = (GridView ) dialog.findViewById(R.id.lv);
 
         // Defined Array values to show in ListView
-        String list = "abcdefghijklmnopqrstuvwxyz";
+        String list = "abcdefghijklmnopqrstuvwxyz".toUpperCase();
         final String [] values = new String[list.length()];
 
         for(int i = 0; i < list.length(); i++){
@@ -129,7 +129,8 @@ public class MainActivity extends AppCompatActivity {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ButtonItem btn = createKey(x, y, values[position].charAt(0)+"");
+                System.out.println("this");
+                ButtonItem btn = createKey(x, y, "VK_"+values[position].charAt(0));
                 RelativeLayout layout = (RelativeLayout) findViewById(R.id.activity_main);
                 layout.addView(btn);
                 dialog.dismiss();
@@ -239,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return true;
 
-            case R.id.action_check2:
+            Q case R.id.action_check2:
                 item.setChecked(!item.isChecked());
                 SharedPreferences settings2 = getSharedPreferences("settings", 0);
                 SharedPreferences.Editor editor2 = settings2.edit();

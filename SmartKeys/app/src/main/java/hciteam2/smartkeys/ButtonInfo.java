@@ -15,7 +15,9 @@ public class ButtonInfo {
         this.x = x;
         this.y = y;
         this.val = symbol;
-        this.name = val.substring(3);
+        if(symbol.length() >= 3){
+            this.name = val.substring(3);
+        }
     }
 
     public void setVal(String val){ this.val = val;}
