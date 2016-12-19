@@ -26,5 +26,21 @@
         android:showAsAction="never"
         android:visible="true"
         android:checkable="true"/>
+    <item
+        android:id="@+id/action_check4"
+        android:title="Delete"
+        android:orderInCategory="200"
+        android:showAsAction="never"
+        android:visible="true"
+        android:checkable="true"/>
+
+    <item  android:id="@+id/action_newPage"
+        android:title="Create a new page" />
+
+    <item android:title="Rename current page"
+        android:id="@+id/action_renamePage" />
+
+    <item android:title="Remove current page"
+        android:id="@+id/action_removePage" />
 
 </menu>

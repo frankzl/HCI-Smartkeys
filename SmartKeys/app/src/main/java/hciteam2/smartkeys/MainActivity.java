@@ -6,8 +6,16 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.text.method.KeyListener;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -20,10 +28,21 @@ import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.os.AsyncTask;
 import android.content.SharedPreferences;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Array;
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,6 +68,9 @@ public class MainActivity extends AppCompatActivity {
     private boolean editing = false;
     private boolean rearranging = false;
     private boolean scaling = false;
+    private boolean deleting = false;
+
+    private int currentMaxID = 0;
 
     private LinkedList<ButtonItem> coordinates;
     private TCPClient mTcpClient;
@@ -57,28 +79,121 @@ public class MainActivity extends AppCompatActivity {
     int buttonWidth = 200;
     int buttonHeight = 200;
 
+    private Toolbar toolbar;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private ViewPagerAdapter adapter;
+
+    ArrayList<KeyPage> keyPages = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.activity_main);
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        setupViewPager(viewPager);
+        //viewPager.setPagingEnabled(false);
 
-        layout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if(editing) {
-                        //coordinates.add(new ButtonItem((int) event.getX(), (int) event.getY(), 'c', MainActivity.this));
-                        generateListView(event.getX(), event.getY());
-                    }
-                }
-                return true;
-            }
-        });
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+    }
 
-        createKeysFromList(KeyboardLayout.getQWERTYList());
-        coordinates = new LinkedList<>();
+    private void setupViewPager(ViewPager viewPager) {
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        loadConfiguration();
+        addPage("Basic", createPage(0));
+        viewPager.setAdapter(adapter);
+    }
+
+    private void saveConfiguration(){
+        String data = ""+currentMaxID;
+        for(int i = 0; i < keyPages.size(); i++){
+            data += ";;"+keyPages.get(i).getIndex()+"__"+adapter.getPageTitle(i);
+        }
+        System.out.println(data);
+        FileWriter.writeToFile(data, this, "mainConfig");
+    }
+
+    private void loadConfiguration(){
+        String data = FileWriter.readFromFile(this, "mainConfig");
+        String [] set = data.split(";;");
+        if(data.length() > 0)
+            currentMaxID = Integer.parseInt(set[0]);
+        for(int i = 1; i < set.length; i++){
+            String [] obj = set[i].split("__");
+            addPage(obj[1], createPage(Integer.parseInt(obj[0])));
+        }
+    }
+
+    private void removeCurrentPage(){
+        adapter.removeCurrentPage();
+        saveConfiguration();
+        viewPager.setAdapter(adapter);
+    }
+
+    private void renameCurrentPage(){
+        LayoutInflater li = LayoutInflater.from(context);
+        View promptsView = li.inflate(R.layout.remenu, null);
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                context);
+
+        // set prompts.xml to alertdialog builder
+        alertDialogBuilder.setView(promptsView);
+
+        final EditText userInput = (EditText) promptsView
+                .findViewById(R.id.renamePage);
+
+        // set dialog message
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                adapter.renameCurrentPage(userInput.getText().toString());
+                                saveConfiguration();
+                                viewPager.setAdapter(adapter);
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        // show it
+        alertDialog.show();
+    }
+
+    private void addPage(String title, KeyPage page){
+        adapter.addFragment(page, title);
+        keyPages.add(page);
+        viewPager.setAdapter(adapter);
+        saveConfiguration();
+    }
+
+    private KeyPage createPage(int index){
+        Bundle bundle = new Bundle();
+        bundle.putString("index", index+"");
+        //String text = "h"+index;
+        KeyPage p = new KeyPage();
+        bundle.putParcelableArrayList("keylist", KeyboardLayout.getQWERTYList());
+        p.setArguments(bundle);
+
+        if(currentMaxID < index) currentMaxID = index;
+
+        return p;
+    }
+
+    protected void onStop(){
+        super.onStop();
+        for(int i=0; i < keyPages.size(); i++)
+            keyPages.get(i).saveKeyPage(this);
+        saveConfiguration();
     }
 
     public void connectToServer(String ip){
@@ -88,62 +203,10 @@ public class MainActivity extends AppCompatActivity {
         serverTask.execute("");
     }
 
-    public ButtonItem createKey(float x, float y, String val){
-        final ButtonItem btn = new ButtonItem(x, y, val, this);
-        btn.setOnTouchListener(new KeysOnTouchListener(mTcpClient, btn.information));
-        return btn;
-    }
-
-    public ButtonItem createKey(ButtonInfo info){
-        ButtonItem btn = new ButtonItem(info, this);
-        return btn;
-    }
-
-    public void createKeysFromList(List<ButtonInfo> infoList){
-        System.out.println("creating my buttons"+infoList.size());
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.activity_main);
-
-        for(int i = 0; i < infoList.size(); i++){
-            ButtonInfo info = infoList.get(i);
-            ButtonItem btn = createKey(info.getX(), info.getY(), info.getVal());
-            layout.addView(btn);
-        }
-    }
-
-    public void generateListView(final float x, final float y){
-        final Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.list);
-
-        GridView lv = (GridView ) dialog.findViewById(R.id.lv);
-
-        // Defined Array values to show in ListView
-        String list = "abcdefghijklmnopqrstuvwxyz".toUpperCase();
-        final String [] values = new String[list.length()];
-
-        for(int i = 0; i < list.length(); i++){
-            values[i] = ""+list.charAt(i);
-        }
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, android.R.id.text1, values);
-        lv.setAdapter(adapter);
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                System.out.println("this");
-                ButtonItem btn = createKey(x, y, "VK_"+values[position].charAt(0));
-                RelativeLayout layout = (RelativeLayout) findViewById(R.id.activity_main);
-                layout.addView(btn);
-                dialog.dismiss();
-            }
-        });
-        dialog.setCancelable(true);
-        dialog.setTitle("ListView");
-        dialog.show();
-    }
-
     public boolean isEditing(){ return editing;}
     public boolean isRearranging(){ return rearranging;}
     public boolean isScaling(){return scaling;}
+    public boolean isDeleting(){return deleting;}
 
     public TCPClient getTcpClient(){ return mTcpClient; }
 
@@ -185,6 +248,16 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
+            case R.id.action_removePage:
+                removeCurrentPage();
+                return true;
+            case R.id.action_renamePage:
+                renameCurrentPage();
+                return true;
+            case R.id.action_newPage:
+                System.out.println("maxid:"+currentMaxID);
+                addPage("Page"+(currentMaxID+1),createPage(currentMaxID+1));
+                return true;
             case R.id.item1:
 
                 // get prompts.xml view
@@ -240,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return true;
 
-            Q case R.id.action_check2:
+            case R.id.action_check2:
                 item.setChecked(!item.isChecked());
                 SharedPreferences settings2 = getSharedPreferences("settings", 0);
                 SharedPreferences.Editor editor2 = settings2.edit();
@@ -252,7 +325,6 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     Toast.makeText(getApplicationContext(),"Rearrange mode is currently OFF",Toast.LENGTH_LONG).show();
                 }
-
                 return true;
 
             case R.id.action_check3:
@@ -270,7 +342,20 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 return true;
+            case R.id.action_check4:
+                item.setChecked(!item.isChecked());
 
+                SharedPreferences settings4 = getSharedPreferences("settings", 0);
+                SharedPreferences.Editor editor4 = settings4.edit();
+                editor4.putBoolean("checkbox", item.isChecked());
+                editor4.commit();
+                deleting = item.isChecked();
+                if(item.isChecked()){
+                    Toast.makeText(getApplicationContext(),"Deleting mode is currently ON",Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(getApplicationContext(),"Deleting mode is currently OFF",Toast.LENGTH_LONG).show();
+                }
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);

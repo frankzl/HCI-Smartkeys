@@ -57,5 +57,17 @@
     <EditText
         android:id="@+id/editvalue"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/> >
+        android:layout_height="wrap_content"/>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:rowCount="15"
+        android:columnCount="8"
+        android:id="@+id/buttonlist">
+
+
+    </GridLayout>
+
 </LinearLayout>

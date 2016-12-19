@@ -15,7 +15,7 @@ public class KeyboardLayout {
                                 "VK_SHIFTxVK_BACK_QUOTExZXCVBNMxVK_COMMAxVK_PERIODxVK_SLASHxVK_SHIFT",
                                 "VK_CONTROLxVK_WINDOWSxVK_ALTxVK_SPACExVK_ALT_GRAPHxVK_CONTROLxVK_LEFTxVK_UPxVK_DOWNxVK_RIGHT"};
 
-    public static List<ButtonInfo> getQWERTYList(){
+    public static ArrayList<ButtonInfo> getQWERTYList(){
         ArrayList<ButtonInfo> keylist = new ArrayList<>();
         for(int i = 0; i < qwerty.length; i++){
             String[] line = qwerty[i].split("x");
